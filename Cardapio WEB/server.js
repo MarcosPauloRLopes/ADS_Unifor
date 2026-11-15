@@ -5,7 +5,6 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -58,7 +57,7 @@ app.post('/categorias', (req, res) => {
     });
 });
 
-// Rota para REmover uma categoria existente.
+// Rota para Remover uma categoria existente.
 app.delete('/categorias/:id', (req, res) => {
     const { id } = req.params;
     const query = 'DELETE FROM categoria WHERE id_categoria = ?';
@@ -76,7 +75,7 @@ app.delete('/categorias/:id', (req, res) => {
     });
 });
 
-// Rota para modificar uma categoria existente.
+// Rota para Modificar uma categoria existente.
 app.put('/categorias/:id', (req, res) => {
     const { id } = req.params;
     const { nome_categoria } = req.body;
@@ -91,6 +90,84 @@ app.put('/categorias/:id', (req, res) => {
             return res.status(404).json({ mensagem: 'Categoria não encontrada.' });
         }
         res.json({ mensagem: 'Categoria atualizada com sucesso!' });
+    });
+});
+
+/*  
+    ////////////////////////////
+    ROTAS DA ENTIDADE DE PRATOS.
+    ////////////////////////////
+*/ 
+
+// Rota para Lista todos os pratos com a sua categoria.
+app.get('/pratos', (req, res) => {
+    const query = `
+        SELECT 
+            p.id_prato, 
+            p.nome_prato, 
+            p.desc_prato, 
+            p.preco_prato, 
+            p.id_categoria_prato,
+            c.nome_categoria 
+        FROM pratos p
+        INNER JOIN categoria c ON p.id_categoria_prato = c.id_categoria
+    `;
+
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error("Erro ao buscar pratos:", err);
+            return res.status(500).json({ erro: "Erro ao buscar pratos." });
+        }
+        res.json(results);
+    });
+});
+
+//Rota para Adicionar um novo prato a uma categoria existente.
+app.post('/pratos', (req, res) => {
+    const { id_prato, nome_prato, desc_prato, preco_prato, id_categoria_prato } = req.body;
+    const query = 'INSERT INTO pratos (id_prato, nome_prato, desc_prato, preco_prato, id_categoria_prato) VALUES (?, ?, ?, ?, ?)';
+
+    db.query(query, [id_prato, nome_prato, desc_prato, preco_prato, id_categoria_prato], (err, result) => {
+        if (err) {
+            console.error("Erro ao adicionar prato:", err);
+            return res.status(500).json({ erro: "Erro ao cadastrar prato." });
+        }
+        res.status(201).json({ mensagem: 'Prato cadastrado com sucesso!' });
+    });
+});
+
+// Rota para Remover um prato de uma categoria existente.
+app.delete('/pratos/:id', (req, res) => {
+    const { id } = req.params;
+    const query = 'DELETE FROM pratos WHERE id_prato = ?';
+
+    db.query(query, [id], (err, result) => {
+        if (err) {
+            console.error("Erro ao remover prato:", err);
+            return res.status(500).json({ erro: "Erro ao remover prato." });
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ mensagem: 'Prato não encontrado.' });
+        }
+        res.json({ mensagem: 'Prato removido com sucesso!' });
+    });
+});
+
+// Rota para Modificar um prato existente.
+app.put('/pratos/:id', (req, res) => {
+    const { id } = req.params;
+    const { nome_prato, desc_prato, preco_prato, id_categoria_prato } = req.body;
+    const query = 'UPDATE pratos SET nome_prato = ?, desc_prato = ?, preco_prato = ?, id_categoria_prato = ? WHERE id_prato = ?';
+
+    db.query(query, [nome_prato, desc_prato, preco_prato, id_categoria_prato, id], (err, result) => {
+        if (err) {
+            console.error("Erro ao atualizar prato:", err);
+            return res.status(500).json({ erro: "Erro ao atualizar prato." });
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ mensagem: 'Prato não encontrado.' });
+        }
+        res.json({ mensagem: 'Prato atualizado com sucesso!' });
     });
 });
 
