@@ -1,0 +1,260 @@
+/* ==========================================
+   1. CONFIGURAÇÕES GLOBAIS E VARIÁVEIS
+   ================================---------- */
+:root {
+    --bg-principal: #f7efe8;
+    --bg-card: #ffffff;
+    --texto-principal: #1a1512;
+    --texto-secundario: #5c504a;
+    --cor-primaria: #b35934;
+    --cor-primaria-hover: #9e4c2b;
+    --borda-sutil: #eae5e0;
+}
+
+body {
+    background-color: var(--bg-principal);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--texto-principal);
+    margin: 0;
+    padding: 0;
+}
+
+/* ==========================================
+   2. CABEÇALHO DO SISTEMA (Padronizado)
+   ================================---------- */
+.header-sistema {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 48px;
+    background-color: var(--bg-card);
+    border-bottom: 1px solid #eadfd5;
+}
+
+.logo {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--cor-primaria);
+    letter-spacing: -0.5px;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--texto-secundario);
+    font-size: 15px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 20px;
+    transition: all 0.2s;
+}
+
+.nav-links a:hover {
+    color: var(--cor-primaria);
+}
+
+.nav-links a.ativo {
+    background-color: var(--cor-primaria);
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* ==========================================
+   3. CONTAINERS E ESTRUTURA GERAL
+   ================================---------- */
+.container-principal {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.wrapper-centralizado {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 90px);
+    padding: 20px;
+}
+
+.bloco-formulario {
+    width: 100%;
+    max-width: 720px;
+}
+
+/* ==========================================
+   4. ELEMENTOS DE TELA E BOTÕES
+   ================================---------- */
+.secao-topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.secao-topo h2, .titulo-form-cat {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--texto-principal);
+    margin: 0 0 16px 0;
+    letter-spacing: -0.5px;
+}
+
+.btn-novo {
+    background-color: var(--cor-primaria);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-novo:hover {
+    background-color: var(--cor-primaria-hover);
+}
+
+.link-voltar-cat {
+    text-decoration: none;
+    font-size: 14px;
+    color: #8c7a6b;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 8px;
+}
+
+.link-voltar-cat:hover {
+    color: var(--cor-primaria);
+}
+
+/* ==========================================
+   5. CARDS E FORMULÁRIOS
+   ================================---------- */
+.grid-categorias {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.card-categoria {
+    background-color: var(--bg-card);
+    border: 1px solid var(--borda-sutil);
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+}
+
+.card-info h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--texto-principal);
+    margin: 0 0 8px 0;
+}
+
+.card-info p {
+    font-size: 13px;
+    color: var(--texto-secundario);
+    margin: 0 0 20px 0;
+}
+
+.card-divider {
+    height: 1px;
+    background-color: #f0eae4;
+    margin-bottom: 15px;
+}
+
+.card-acoes {
+    display: flex;
+    gap: 16px;
+}
+
+.card-acoes button {
+    background: none;
+    border: none;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0;
+}
+
+.btn-ver { color: var(--cor-primaria); }
+.btn-editar { color: var(--texto-secundario); }
+.btn-excluir { color: #d9534f; }
+.card-acoes button:hover { text-decoration: underline; }
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--texto-principal);
+    margin-bottom: 10px;
+}
+
+.form-group input[type="text"] {
+    width: 100%;
+    padding: 14px 18px;
+    font-size: 16px;
+    border: 1px solid #dcd4cc;
+    border-radius: 8px;
+    outline: none;
+    box-sizing: border-box;
+    background-color: #ffffff;
+    transition: border-color 0.2s;
+}
+
+.form-group input[type="text"]:focus {
+    border-color: var(--cor-primaria);
+    box-shadow: 0 0 0 3px rgba(179, 89, 52, 0.1);
+}
+
+@media (max-width: 768px) {
+    .grid-categorias {
+        grid-template-columns: 1fr;
+    }
+    .header-sistema {
+        padding: 15px 20px;
+    }
+}
+
+.toast-sucesso {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background-color: #e6f4ea; /* Fundo verde claro bem suave */
+    color: #137333; /* Texto verde escuro */
+    border: 1px solid #ceead6;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.toast-sucesso.mostrar {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}

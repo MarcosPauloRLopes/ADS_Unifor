@@ -12,7 +12,6 @@ const db = mysql.createConnection({
     database: 'Cardapio_WEB'
 });
 
-
 db.connect((err) => {
     if (err) {
         console.error('Erro ao conectar ao MySQL:', err);
@@ -47,13 +46,14 @@ app.post('/categorias', (req, res) => {
 
     db.query(query, [nome_categoria], (err, result) => {
         if (err) {
-            console.error("Erro ao adicionar categoria:", err);
+            // Código de erro do MySQL para entrada duplicada (ER_DUP_ENTRY)
+            if (err.code === 'ER_DUP_ENTRY') {
+                return res.status(400).json({ erro: "Esta categoria já existe!" });
+            }
+            console.error("Erro ao cadastrar categoria:", err);
             return res.status(500).json({ erro: "Erro ao cadastrar categoria." });
         }
-        res.status(201).json({ 
-            mensagem: 'Categoria cadastrada com sucesso!', 
-            id_categoria: result.insertId 
-        });
+        res.status(201).json({ mensagem: "Categoria cadastrada com sucesso!" });
     });
 });
 
@@ -64,14 +64,21 @@ app.delete('/categorias/:id', (req, res) => {
 
     db.query(query, [id], (err, result) => {
         if (err) {
-            console.error("Erro ao remover categoria:", err);
-            // Geralmente ocorre erro se houver pratos vinculados (Foreign Key)
-            return res.status(500).json({ erro: "Não é possível excluir esta categoria pois existem pratos vinculados a ela." });
+            // Código do MySQL para violação de chave estrangeira (ER_ROW_IS_REFERENCED_2)
+            if (err.errno === 1451 || err.code === 'ER_ROW_IS_REFERENCED_2') {
+                return res.status(400).json({ 
+                    erro: "Não é possível excluir esta categoria pois ainda existem pratos cadastrados nela!" 
+                });
+            }
+            console.error("Erro ao deletar categoria:", err);
+            return res.status(500).json({ erro: "Erro ao deletar categoria." });
         }
+
         if (result.affectedRows === 0) {
-            return res.status(404).json({ mensagem: 'Categoria não encontrada.' });
+            return res.status(404).json({ mensagem: "Categoria não encontrada." });
         }
-        res.json({ mensagem: 'Categoria removida com sucesso!' });
+
+        res.json({ mensagem: "Categoria excluída com sucesso!" });
     });
 });
 

@@ -3,9 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Sabor de Casa - Gerenciamento de Cardapio</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="toastSucesso" class="toast-sucesso">
+    <span>✔</span> Categoria cadastrada!
+    </div>
     
+    <header class="header-sistema">
+        <div class="logo">Sabor de Casa</div>
+        <nav class="nav-links">     
+            <a href="Index.html">Cardápio</a>
+            <a href="Development.html" class="ativo">Gerenciar</a>
+        </nav>
+    </header>
+
+    <main class="container-principal">
+        
+        <div class="secao-topo">
+            <h2>Categorias</h2>
+            <button class="btn-novo" onclick="abrirCadastroCategoria()">+ Nova categoria</button>
+        </div>
+
+        
+        <div id="gridCategorias" class="grid-categorias">
+        
+        </div>
+
+    </main>
+
+    <script src="script.js"></script>
 </body>
 </html>
