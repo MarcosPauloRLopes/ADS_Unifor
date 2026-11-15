@@ -106,7 +106,8 @@ app.get('/pratos', (req, res) => {
             p.id_prato, 
             p.nome_prato, 
             p.desc_prato, 
-            p.preco_prato, 
+            p.preco_prato,
+            p.disponivel, 
             p.id_categoria_prato,
             c.nome_categoria 
         FROM pratos p
@@ -168,6 +169,27 @@ app.put('/pratos/:id', (req, res) => {
             return res.status(404).json({ mensagem: 'Prato não encontrado.' });
         }
         res.json({ mensagem: 'Prato atualizado com sucesso!' });
+    });
+});
+
+// Rota para Modificar a disponibilidade de um prato.
+app.patch('/pratos/:id/disponibilidade', (req, res) => {
+    const { id } = req.params;
+    const { disponivel } = req.body; // Espera receber { disponivel: 0 } ou { disponivel: 1 }
+
+    const query = 'UPDATE pratos SET disponivel = ? WHERE id_prato = ?';
+
+    db.query(query, [disponivel, id], (err, result) => {
+        if (err) {
+            console.error("Erro ao alterar disponibilidade:", err);
+            return res.status(500).json({ erro: "Erro ao atualizar disponibilidade." });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ mensagem: 'Prato não encontrado.' });
+        }
+
+        res.json({ mensagem: 'Disponibilidade atualizada com sucesso!' });
     });
 });
 
