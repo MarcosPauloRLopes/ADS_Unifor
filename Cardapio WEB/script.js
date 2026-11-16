@@ -1,121 +1,138 @@
 let listaCategorias = [];
 let listaPratos = [];
-
-function carregarCategorias() {
+// Função para Listar todas as categorias em card na pagina de Development
+function carregarCategoriasEmCards() {
     fetch('http://localhost:3000/categorias')
-        .then(res => res.json())
-        .then(dados => {
-            const containerCategorias = document.getElementById("listaCategorias");
-            containerCategorias.innerHTML = "";
+    .then(res => res.json())
+    .then(dados => {
+        const grid = document.getElementById("gridCategorias");
+        grid.innerHTML = "";
 
-            if (dados.length === 0) {
-                containerCategorias.innerHTML = "<p>Nenhuma categoria cadastrada.</p>";
-                return;
-            }
+        if (dados.length === 0) {
+            grid.innerHTML = "<p>Nenhuma categoria cadastrada.</p>";
+            return;
+        }
 
-            dados.forEach(cat => {
-                const divCat = document.createElement("div");
-                divCat.className = "item-categoria";
-                
-                divCat.innerHTML = `
-                    <span>${cat.nome_categoria}</span>
-                    <button type="button" onclick="deletarCategoria(${cat.id_categoria})" style="background-color: #d9534f; color: white; border: none; padding: 4px 8px;">remover</button>
-                `;
+        dados.forEach(cat => {
+            const cardDiv = document.createElement("div");
+            cardDiv.className = "card-categoria";
 
-                containerCategorias.appendChild(divCat);
-            });
-        })
-        .catch(err => console.log("Erro ao carregar categorias:", err));
+            // Se a categoria tiver descrição, criamos a tag <p>. Se não tiver, fica uma string vazia ("")
+            const htmlDescricao = (cat.descricao_categoria && cat.descricao_categoria.trim() !== "") 
+                ? ` - ${cat.descricao_categoria}` 
+                : "";
+
+            cardDiv.innerHTML = `
+                <div class="card-info">
+                    <h3>${cat.nome_categoria}</h3>
+                    <p>${cat.total_pratos} prato(s)${htmlDescricao}</p>
+                </div>
+                <div class="card-divider"></div>
+                <div class="card-acoes">
+                    <button class="btn-ver" onclick="verPratos(${cat.id_categoria})">Ver pratos</button>
+                    <button class="btn-editar" onclick="abrirCadastroPrato(${cat.id_categoria})">Adicionar pratos a Categoria</button>
+                    <button class="btn-excluir" onclick="deletarCategoria(${cat.id_categoria})">Excluir Categoria</button>
+                </div>
+            `;
+
+            grid.appendChild(cardDiv);
+        });
+    })
+    .catch(err => console.error("Erro ao carregar os cards de categorias:", err));
 }
 
-function cadastrarCategoria(event) {
-    event.preventDefault();
-
-    const nomeInput = document.getElementById("nomeCategoria");
-    const nome_categoria = nomeInput.value;
-
-    if (!nome_categoria.trim()) {
-        alert("Por favor, digite o nome da categoria.");
+// função para Remover uma categoria.
+function deletarCategoria(id_categoria) {
+    if (!confirm("Tem certeza que deseja excluir esta categoria?")) {
         return;
     }
 
-    fetch('http://localhost:3000/categorias', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nome_categoria })
+    fetch(`http://localhost:3000/categorias/${id_categoria}`, {
+        method: 'DELETE'
     })
     .then(async res => {
         const resposta = await res.json();
         
         if (!res.ok) {
-            alert(resposta.erro || "Erro ao cadastrar categoria.");
+            // Exibe a mensagem de erro amigável vinda do backend (ex: "ainda existem pratos...")
+            alert(resposta.erro || "Não foi possível excluir a categoria.");
             return;
         }
 
-        // Redireciona para a página principal informando que deu sucesso
-        window.location.href = "Development.html?sucesso=true";
+        // Sucesso na exclusão
+        alert(resposta.mensagem || "Categoria excluída com sucesso!");
+        
+        // Recarrega os cards na tela para sumir com a categoria excluída
+        carregarCategoriasEmCards();
+    })
+    .catch(err => {
+        console.error("Erro na requisição de exclusão:", err);
+        alert("Erro de conexão com o servidor.");
+    });
+}
+
+// Mensagem q é exibida na tela
+window.addEventListener('DOMContentLoaded', () => {
+    const grid = document.getElementById('gridCategorias');
+    if (grid && typeof carregarCategoriasEmCards === 'function') {
+        carregarCategoriasEmCards();
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const toast = document.getElementById('toastSucesso');
+    const textoToast = document.getElementById('textoToast');
+
+    if (toast && textoToast) {
+        let mensagem = "";
+
+        if (urlParams.get('sucesso') === 'true') {
+            mensagem = "Categoria cadastrada com sucesso!";
+        } else if (urlParams.get('pratoCadastrado') === 'true') {
+            mensagem = "Prato cadastrado com sucesso!";
+        }
+
+        if (mensagem !== "") {
+            textoToast.textContent = mensagem;
+            toast.classList.add('mostrar');
+            
+            setTimeout(() => {
+                toast.classList.remove('mostrar');
+            }, 3500);
+
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }
+});
+
+// Funções para Redirecionar para a pagina correspondente.
+function abrirCadastroCategoria() {
+    window.location.href = "Adicionar_categoria.html";
+}
+
+function abrirCadastroPrato(id_categoria) {
+    window.location.href = `Adicionar_pratos.html?categoria_id=${id_categoria}`;
+}
+
+function deletarCategoria(id) {
+    if (!confirm("Tem certeza que deseja excluir esta categoria?")) return;
+
+    fetch(`http://localhost:3000/categorias/${id}`, {
+        method: 'DELETE'
+    })
+    .then(async res => {
+        const resposta = await res.json();
+
+        if (!res.ok) {
+            // Exibe a mensagem amigável enviada pelo backend (ex: "Não é possível excluir...")
+            alert(resposta.erro || "Erro ao excluir.");
+            return;
+        }
+
+        // Sucesso: Recarrega os cards
+        window.location.reload();
     })
     .catch(err => {
         console.error("Erro na requisição:", err);
         alert("Erro de conexão com o servidor.");
     });
-}
-
-function carregarCategoriasEmCards() {
-    fetch('http://localhost:3000/categorias')
-        .then(res => res.json())
-        .then(dados => {
-            const grid = document.getElementById("gridCategorias");
-            grid.innerHTML = ""; // Limpa a grid antes de preencher
-
-            if (dados.length === 0) {
-                grid.innerHTML = "<p>Nenhuma categoria cadastrada no momento.</p>";
-                return;
-            }
-
-            dados.forEach(cat => {
-                const cardDiv = document.createElement("div");
-                cardDiv.className = "card-categoria";
-
-                // Monta o layout HTML idêntico ao modelo da imagem
-                cardDiv.innerHTML = `
-                    <div class="card-info">
-                        <h3>${cat.nome_categoria}</h3>
-                        <p>Gerenciamento de itens</p>
-                    </div>
-                    <div class="card-divider"></div>
-                    <div class="card-acoes">
-                        <button class="btn-ver" onclick="verPratosDaCategoria(${cat.id_categoria})">Ver pratos</button>
-                        <button class="btn-editar" onclick="editarCategoria(${cat.id_categoria})">Editar</button>
-                        <button class="btn-excluir" onclick="deletarCategoria(${cat.id_categoria})">Excluir</button>
-                    </div>
-                `;
-
-                grid.appendChild(cardDiv);
-            });
-        })
-        .catch(err => console.error("Erro ao carregar os cards de categorias:", err));
-}
-
-// Executa a função assim que a página é aberta
-window.addEventListener('DOMContentLoaded', () => {
-    carregarCategoriasEmCards();
-
-    // Verifica se a URL contém o parâmetro de sucesso
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('sucesso') === 'true') {
-        const toast = document.getElementById('toastSucesso');
-        if (toast) {
-            toast.classList.add('mostrar');
-
-            // Remove a mensagem da tela após 3.5 segundos
-            setTimeout(() => {
-                toast.classList.remove('mostrar');
-            }, 3500);
-        }
-    }
-});
-// Função temporária para o botão de Nova Categoria (você pode redirecionar para a tela de cadastro ou abrir um modal)
-function abrirCadastroCategoria() {
-    window.location.href = "Adicionar_categoria.html";
 }

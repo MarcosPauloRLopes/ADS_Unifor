@@ -32,7 +32,10 @@
                             <label for="nomeCategoria">Nome da categoria *</label>
                             <input type="text" id="nomeCategoria" required placeholder="Ex: Bebidas">
                         </div>
-
+                        <div class="form-group">
+                            <label for="descricaoCategoria">Descrição (opcional)</label>
+                            <input type="text" id="descricaoCategoria" placeholder="Ex: Sucos, refrigerantes e águas" maxlength="255">
+                        </div>
                         <button type="submit" class="btn-novo">Cadastrar categoria</button>
                     
                     </form>
@@ -42,6 +45,40 @@
         </div>
     </main>
 
-    <script src="script.js"></script>
+    <script>
+        function cadastrarCategoria(event) {
+            event.preventDefault();
+
+            const nome_categoria = document.getElementById('nomeCategoria').value;
+            // Captura o valor do campo de descrição (adicione o id correspondente no seu input HTML)
+            const descricao_categoria = document.getElementById('descricaoCategoria').value;
+
+            // Inclui a descrição no objeto que vai para o backend
+            const dadosCategoria = { 
+                nome_categoria, 
+                descricao_categoria 
+            };
+
+            fetch('http://localhost:3000/categorias', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dadosCategoria)
+            })
+            .then(async res => {
+                const resposta = await res.json();
+
+                if (!res.ok) {
+                    alert(resposta.erro || "Erro ao cadastrar categoria.");
+                    return;
+                }
+
+                window.location.href = "Development.html?sucesso=true";
+            })
+            .catch(err => {
+                console.error("Erro na requisição:", err);
+                alert("Erro de conexão com o servidor.");
+            });
+        }
+    </script>
 </body>
 </html>

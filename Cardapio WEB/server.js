@@ -28,7 +28,12 @@ db.connect((err) => {
 
 // Rota para Listar todas as categorias.
 app.get('/categorias', (req, res) => {
-    const query = 'SELECT * FROM categoria';
+    const query = `
+        SELECT c.id_categoria, c.nome_categoria, c.descricao_categoria, COUNT(p.id_prato) AS total_pratos 
+        FROM categoria c 
+        LEFT JOIN pratos p ON c.id_categoria = p.id_categoria_prato 
+        GROUP BY c.id_categoria, c.nome_categoria, c.descricao_categoria
+    `;
 
     db.query(query, (err, results) => {
         if (err) {
@@ -41,17 +46,21 @@ app.get('/categorias', (req, res) => {
 
 // Rota para Adicionar uma nova categoria.
 app.post('/categorias', (req, res) => {
-    const { nome_categoria } = req.body;
-    const query = 'INSERT INTO categoria (nome_categoria) VALUES (?)';
+    const { nome_categoria, descricao_categoria } = req.body;
 
-    db.query(query, [nome_categoria], (err, result) => {
+    if (!nome_categoria) {
+        return res.status(400).json({ erro: "O nome da categoria é obrigatório." });
+    }
+
+    const query = "INSERT INTO categoria (nome_categoria, descricao_categoria) VALUES (?, ?)";
+    
+    // Se a descrição vier vazia, enviamos null para o banco ficar limpo
+    const descricaoFinal = descricao_categoria && descricao_categoria.trim() !== "" ? descricao_categoria : null;
+
+    db.query(query, [nome_categoria, descricaoFinal], (err, result) => {
         if (err) {
-            // Código de erro do MySQL para entrada duplicada (ER_DUP_ENTRY)
-            if (err.code === 'ER_DUP_ENTRY') {
-                return res.status(400).json({ erro: "Esta categoria já existe!" });
-            }
             console.error("Erro ao cadastrar categoria:", err);
-            return res.status(500).json({ erro: "Erro ao cadastrar categoria." });
+            return res.status(500).json({ erro: "Erro ao cadastrar categoria no banco." });
         }
         res.status(201).json({ mensagem: "Categoria cadastrada com sucesso!" });
     });
@@ -59,23 +68,25 @@ app.post('/categorias', (req, res) => {
 
 // Rota para Remover uma categoria existente.
 app.delete('/categorias/:id', (req, res) => {
-    const { id } = req.params;
+    const { id } = req.id || req.params.id;
+    const categoriaId = req.params.id;
+
     const query = 'DELETE FROM categoria WHERE id_categoria = ?';
 
-    db.query(query, [id], (err, result) => {
+    db.query(query, [categoriaId], (err, result) => {
         if (err) {
-            // Código do MySQL para violação de chave estrangeira (ER_ROW_IS_REFERENCED_2)
-            if (err.errno === 1451 || err.code === 'ER_ROW_IS_REFERENCED_2') {
+            if (err.code === 'ER_ROW_IS_REFERENCED_2' || err.errno === 1451) {
                 return res.status(400).json({ 
-                    erro: "Não é possível excluir esta categoria pois ainda existem pratos cadastrados nela!" 
+                    erro: "Não é possível excluir esta categoria pois ela possui pratos cadastrados!" 
                 });
             }
-            console.error("Erro ao deletar categoria:", err);
-            return res.status(500).json({ erro: "Erro ao deletar categoria." });
+
+            console.error("Erro ao excluir categoria:", err);
+            return res.status(500).json({ erro: "Erro ao excluir categoria." });
         }
 
         if (result.affectedRows === 0) {
-            return res.status(404).json({ mensagem: "Categoria não encontrada." });
+            return res.status(404).json({ erro: "Categoria não encontrada." });
         }
 
         res.json({ mensagem: "Categoria excluída com sucesso!" });
@@ -132,15 +143,22 @@ app.get('/pratos', (req, res) => {
 
 //Rota para Adicionar um novo prato a uma categoria existente.
 app.post('/pratos', (req, res) => {
-    const { id_prato, nome_prato, desc_prato, preco_prato, id_categoria_prato } = req.body;
-    const query = 'INSERT INTO pratos (id_prato, nome_prato, desc_prato, preco_prato, id_categoria_prato) VALUES (?, ?, ?, ?, ?)';
+    // Pegamos os dados vindos do front-end
+    const { nome, descricao, preco, id_categoria } = req.body;
 
-    db.query(query, [id_prato, nome_prato, desc_prato, preco_prato, id_categoria_prato], (err, result) => {
+    if (!preco || parseFloat(preco) <= 0) {
+        return res.status(400).json({ erro: "O preço do prato precisa ser maior que R$ 0,00." });
+    }
+
+    // Query ajustada para bater exatamente com o nome da tabela e colunas da sua imagem
+    const query = 'INSERT INTO pratos (nome_prato, desc_prato, preco_prato, id_categoria_prato) VALUES (?, ?, ?, ?)';
+    
+    db.query(query, [nome, descricao, preco, id_categoria], (err, result) => {
         if (err) {
-            console.error("Erro ao adicionar prato:", err);
-            return res.status(500).json({ erro: "Erro ao cadastrar prato." });
+            console.error("Erro ao cadastrar prato no banco:", err);
+            return res.status(500).json({ erro: "Erro ao cadastrar prato no banco de dados." });
         }
-        res.status(201).json({ mensagem: 'Prato cadastrado com sucesso!' });
+        res.status(201).json({ mensagem: "Prato cadastrado com sucesso!" });
     });
 });
 
