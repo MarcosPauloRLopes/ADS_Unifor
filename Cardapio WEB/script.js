@@ -1,11 +1,15 @@
+const API_URL = 'https://adsunifor-production.up.railway.app';
+
 let listaCategorias = [];
 let listaPratos = [];
-// Função para Listar todas as categorias em card na pagina de Development
+
 function carregarCategoriasEmCards() {
-    fetch('https://adsunifor-production.up.railway.app/categorias')
+    fetch(`${API_URL}/categorias`)
     .then(res => res.json())
     .then(dados => {
         const grid = document.getElementById("gridCategorias");
+        if (!grid) return;
+        
         grid.innerHTML = "";
 
         if (dados.length === 0) {
@@ -17,7 +21,6 @@ function carregarCategoriasEmCards() {
             const cardDiv = document.createElement("div");
             cardDiv.className = "card-categoria";
 
-            // Se a categoria tiver descrição, criamos a tag <p>. Se não tiver, fica uma string vazia ("")
             const htmlDescricao = (cat.descricao_categoria && cat.descricao_categoria.trim() !== "") 
                 ? ` - ${cat.descricao_categoria}` 
                 : "";
@@ -25,7 +28,7 @@ function carregarCategoriasEmCards() {
             cardDiv.innerHTML = `
                 <div class="card-info">
                     <h3>${cat.nome_categoria}</h3>
-                    <p>${cat.total_pratos} prato(s)${htmlDescricao}</p>
+                    <p>${cat.total_pratos || 0} prato(s)${htmlDescricao}</p>
                 </div>
                 <div class="card-divider"></div>
                 <div class="card-acoes">
@@ -41,28 +44,23 @@ function carregarCategoriasEmCards() {
     .catch(err => console.error("Erro ao carregar os cards de categorias:", err));
 }
 
-// função para Remover uma categoria.
 function deletarCategoria(id_categoria) {
     if (!confirm("Tem certeza que deseja excluir esta categoria?")) {
         return;
     }
 
-    fetch(`https://adsunifor-production.up.railway.app/categorias/${id_categoria}`, {
+    fetch(`${API_URL}/categorias/${id_categoria}`, {
         method: 'DELETE'
     })
     .then(async res => {
         const resposta = await res.json();
         
         if (!res.ok) {
-            // Exibe a mensagem de erro amigável vinda do backend (ex: "ainda existem pratos...")
             alert(resposta.erro || "Não foi possível excluir a categoria.");
             return;
         }
 
-        // Sucesso na exclusão
         alert(resposta.mensagem || "Categoria excluída com sucesso!");
-        
-        // Recarrega os cards na tela para sumir com a categoria excluída
         carregarCategoriasEmCards();
     })
     .catch(err => {
@@ -71,7 +69,6 @@ function deletarCategoria(id_categoria) {
     });
 }
 
-// Mensagem q é exibida na tela
 window.addEventListener('DOMContentLoaded', () => {
     const grid = document.getElementById('gridCategorias');
     if (grid && typeof carregarCategoriasEmCards === 'function') {
@@ -104,35 +101,14 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Funções para Redirecionar para a pagina correspondente.
 function abrirCadastroCategoria() {
-    window.location.href = "Adicionar_categoria.html";
+    window.location.href = "adicionar_categoria.html";
 }
 
 function abrirCadastroPrato(id_categoria) {
-    window.location.href = `Adicionar_pratos.html?categoria_id=${id_categoria}`;
+    window.location.href = `adicionar_pratos.html?categoria_id=${id_categoria}`;
 }
 
-function deletarCategoria(id) {
-    if (!confirm("Tem certeza que deseja excluir esta categoria?")) return;
-
-    fetch(`https://adsunifor-production.up.railway.app/categorias/${id}`, {
-        method: 'DELETE'
-    })
-    .then(async res => {
-        const resposta = await res.json();
-
-        if (!res.ok) {
-            // Exibe a mensagem amigável enviada pelo backend (ex: "Não é possível excluir...")
-            alert(resposta.erro || "Erro ao excluir.");
-            return;
-        }
-
-        // Sucesso: Recarrega os cards
-        window.location.reload();
-    })
-    .catch(err => {
-        console.error("Erro na requisição:", err);
-        alert("Erro de conexão com o servidor.");
-    });
+function verPratos(id_categoria) {
+    console.log("Ver pratos da categoria:", id_categoria);
 }
