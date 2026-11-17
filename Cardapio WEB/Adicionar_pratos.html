@@ -86,7 +86,7 @@
 
             const dadosPrato = { nome, descricao, preco, id_categoria };
 
-            fetch('http://localhost:3000/pratos', {
+            fetch('https://adsunifor-production.up.railway.app/pratos', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dadosPrato)

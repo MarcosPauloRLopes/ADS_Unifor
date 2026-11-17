@@ -2,7 +2,7 @@ let listaCategorias = [];
 let listaPratos = [];
 // Função para Listar todas as categorias em card na pagina de Development
 function carregarCategoriasEmCards() {
-    fetch('http://localhost:3000/categorias')
+    fetch('https://adsunifor-production.up.railway.app/categorias')
     .then(res => res.json())
     .then(dados => {
         const grid = document.getElementById("gridCategorias");
@@ -47,7 +47,7 @@ function deletarCategoria(id_categoria) {
         return;
     }
 
-    fetch(`http://localhost:3000/categorias/${id_categoria}`, {
+    fetch(`https://adsunifor-production.up.railway.app/categorias/${id_categoria}`, {
         method: 'DELETE'
     })
     .then(async res => {
@@ -116,7 +116,7 @@ function abrirCadastroPrato(id_categoria) {
 function deletarCategoria(id) {
     if (!confirm("Tem certeza que deseja excluir esta categoria?")) return;
 
-    fetch(`http://localhost:3000/categorias/${id}`, {
+    fetch(`https://adsunifor-production.up.railway.app/categorias/${id}`, {
         method: 'DELETE'
     })
     .then(async res => {

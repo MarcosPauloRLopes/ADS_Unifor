@@ -10,7 +10,7 @@ const db = mysql.createConnection({
     user: process.env.MYSQLUSER || 'root',
     password: process.env.MYSQLPASSWORD || '',
     database: process.env.MYSQL_DATABASE || process.env.MYSQLDATABASE || 'Cardapio_WEB',
-    port: process.env.MYSQLPORT || 3306
+    port: process.env.MYSQLPORT || 3000
 });
 
 db.connect((err) => {
@@ -219,6 +219,6 @@ app.patch('/pratos/:id/disponibilidade', (req, res) => {
     });
 });
 
-app.listen(3000, () => {
-    console.log('Servidor rodando na porta 3000 (http://localhost:3000)');
+app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
 });

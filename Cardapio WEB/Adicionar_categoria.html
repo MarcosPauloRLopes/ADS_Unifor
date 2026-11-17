@@ -59,7 +59,7 @@
                 descricao_categoria 
             };
 
-            fetch('http://localhost:3000/categorias', {
+            fetch('https://adsunifor-production.up.railway.app/categorias', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dadosCategoria)
