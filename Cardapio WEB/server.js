@@ -2,6 +2,7 @@ const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 const app = express();
+const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(cors());
 
@@ -10,7 +11,7 @@ const db = mysql.createConnection({
     user: process.env.MYSQLUSER || 'root',
     password: process.env.MYSQLPASSWORD || '',
     database: process.env.MYSQL_DATABASE || process.env.MYSQLDATABASE || 'Cardapio_WEB',
-    port: process.env.MYSQLPORT || 3000
+    port: process.env.MYSQLPORT || 3306
 });
 
 db.connect((err) => {
