@@ -6,18 +6,19 @@ app.use(express.json());
 app.use(cors());
 
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'Cardapio_WEB'
+    host: process.env.MYSQLHOST || 'localhost',
+    user: process.env.MYSQLUSER || 'root',
+    password: process.env.MYSQLPASSWORD || '',
+    database: process.env.MYSQL_DATABASE || process.env.MYSQLDATABASE || 'Cardapio_WEB',
+    port: process.env.MYSQLPORT || 3306
 });
 
 db.connect((err) => {
     if (err) {
-        console.error('Erro ao conectar ao MySQL:', err);
+        console.error('Erro ao conectar ao banco de dados:', err);
         return;
     }
-    console.log('Conectado ao banco de dados MySQL com sucesso!');
+    console.log('Conectado ao banco de dados com sucesso!');
 });
 
 /*  
