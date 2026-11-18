@@ -1,4 +1,4 @@
-const API_URL = 'https://adsunifor-production.up.railway.app';
+const API_URL = 'https://cardapio-web-production-2d729e78.up.railway.app';
 
 let listaCategorias = [];
 let listaPratos = [];
