@@ -145,22 +145,40 @@ app.get('/pratos', (req, res) => {
 
 //Rota para Adicionar um novo prato a uma categoria existente.
 app.post('/pratos', (req, res) => {
-    // Pegamos os dados vindos do front-end
-    const { nome, descricao, preco, id_categoria } = req.body;
+    const nome = (req.body.nome_prato ?? req.body.nome ?? '').trim();
+    const descricao = (req.body.desc_prato ?? req.body.descricao ?? '').trim();
+    const precoRaw = req.body.preco_prato ?? req.body.preco;
+    const preco = parseFloat(
+        typeof precoRaw === 'string' ? precoRaw.replace(',', '.') : precoRaw
+    );
+    const id_categoria = Number(
+        req.body.id_categoria_prato ?? req.body.id_categoria
+    );
+    const disponivel =
+        req.body.disponivel === 0 || req.body.disponivel === false || req.body.disponivel === '0'
+            ? 0
+            : 1;
 
-    if (!preco || parseFloat(preco) <= 0) {
+    if (!nome) {
+        return res.status(400).json({ erro: "O nome do prato é obrigatório." });
+    }
+
+    if (Number.isNaN(preco) || preco <= 0) {
         return res.status(400).json({ erro: "O preço do prato precisa ser maior que R$ 0,00." });
     }
 
-    // Query ajustada para bater exatamente com o nome da tabela e colunas da sua imagem
-    const query = 'INSERT INTO pratos (nome_prato, desc_prato, preco_prato, id_categoria_prato) VALUES (?, ?, ?, ?)';
-    
-    db.query(query, [nome, descricao, preco, id_categoria], (err, result) => {
+    if (!id_categoria) {
+        return res.status(400).json({ erro: "A categoria do prato é obrigatória." });
+    }
+
+    const query = 'INSERT INTO pratos (nome_prato, desc_prato, preco_prato, id_categoria_prato, disponivel) VALUES (?, ?, ?, ?, ?)';
+
+    db.query(query, [nome, descricao, preco, id_categoria, disponivel], (err, result) => {
         if (err) {
             console.error("Erro ao cadastrar prato no banco:", err);
             return res.status(500).json({ erro: "Erro ao cadastrar prato no banco de dados." });
         }
-        res.status(201).json({ mensagem: "Prato cadastrado com sucesso!" });
+        res.status(201).json({ mensagem: "Prato cadastrado com sucesso!", id_prato: result.insertId });
     });
 });
 

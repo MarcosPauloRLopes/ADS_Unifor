@@ -1,23 +1,49 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sabor de Casa - Cardápio</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sabor de Casa — Cardápio</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-   
     <header class="header-sistema">
         <div class="logo">Sabor de Casa</div>
-        <nav class="nav-links">
-            <a href="index.html" class="ativo">Cardápio</a>
-            <a href="development.html">Gerenciar</a>
+        <nav class="nav-links">     
+            <a href="index.html">Cardápio</a>
+            <a href="development.html" class="ativo">Gerenciar</a>
         </nav>
     </header>
+   
+    <div id="toastSucesso" class="toast-sucesso">
+        <span id="textoToast"></span>
+    </div>
+   
+    <section class="hero">
+        <p class="subtitulo-topo">CARDÁPIO DO DIA</p>
+        <h1>Comida de casa,<br>feita com carinho</h1>
+        <p id="resumo-opcoes">Carregando opções...</p>
+    </section>
 
     <main class="container-principal">
-        <h2>Cardápio do Cliente</h2>
+        <div class="controles">
+            <input type="text" id="campo-busca" placeholder="Buscar prato... (ex: frango, salada)" />
+            <label class="toggle-esgotados">
+            <input type="checkbox" id="toggle-esgotados" />
+            <span>Mostrar esgotados</span>
+            </label>
+        </div>
+
+        <div id="filtros-categoria" class="filtros-categoria"></div>
+        <div id="lista-cardapio"></div>
+
+        <div id="rodape-checkout" class="rodape-checkout">
+            <div class="rodape-checkout-info">
+            <span>Itens no carrinho: <strong id="rodape-qtd">0</strong></span>
+            <span>Total: <strong id="rodape-total">R$ 0,00</strong></span>
+            </div>
+            <a href="order.html" class="btn-ir-checkout">Ir para o carrinho de compras →</a>
+        </div>
     </main>
 
     <script src="script.js"></script>

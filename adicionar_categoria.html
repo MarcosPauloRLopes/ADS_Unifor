@@ -50,13 +50,11 @@
             event.preventDefault();
 
             const nome_categoria = document.getElementById('nomeCategoria').value;
-            // Captura o valor do campo de descrição (adicione o id correspondente no seu input HTML)
             const descricao_categoria = document.getElementById('descricaoCategoria').value;
 
-            // Inclui a descrição no objeto que vai para o backend
-            const dadosCategoria = { 
-                nome_categoria, 
-                descricao_categoria 
+            const dadosCategoria = {
+                nome_categoria,
+                descricao_categoria
             };
 
             fetch('https://cardapio-web-production-2d729e78.up.railway.app/categorias', {
@@ -72,7 +70,7 @@
                     return;
                 }
 
-                window.location.href = "development.html?sucesso=true";
+                window.location.href = "development.html?adicionarCategoria=true";
             })
             .catch(err => {
                 console.error("Erro na requisição:", err);

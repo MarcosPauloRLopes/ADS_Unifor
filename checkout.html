@@ -3,9 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Sabor de Casa - Checkout</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    
+
+    <header class="header-sistema">
+        <div class="logo">Sabor de Casa</div>
+        <nav class="nav-links">     
+            <a href="index.html">Cardápio</a>
+            <a href="development.html" class="ativo">Gerenciar</a>
+        </nav>
+    </header>
+
+    <main class="container-principal">
+        <div class="cabecalho-form-container">
+            <a href="order.html" class="link-voltar-cat">← Voltar ao pedido</a>
+            <h1 class="titulo-form-cat">Finalizar pedido (Checkout)</h1>
+        </div>
+
+        <div id="aviso-carrinho-vazio" style="display: none;" class="card-prato">
+            <p class="prato-desc">Nenhum item encontrado no carrinho para finalizar.</p>
+            <a href="index.html" class="btn-ir-checkout">Ir para o cardápio</a>
+        </div>
+
+        <form id="form-checkout" onsubmit="finalizarCheckout(event)">
+            <div class="card-categoria" style="margin-bottom: 18px;">
+                <div class="card-info" style="width: 100%;">
+                    <h3>Como você quer receber o pedido?</h3>
+                    <div class="prato-controles" style="margin-top: 10px;">
+                        <label>
+                            <input type="radio" name="tipoEntrega" value="ENTREGA" checked onchange="alternarTipoEntrega()">
+                            Entrega
+                        </label>
+                        <label style="margin-left: 16px;">
+                            <input type="radio" name="tipoEntrega" value="RETIRADA" onchange="alternarTipoEntrega()">
+                            Retirada no local
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-categoria" style="margin-bottom: 18px;">
+                <div class="card-info" style="width: 100%;">
+                    <div class="form-group">
+                        <label for="nomeCliente">Nome do cliente *</label>
+                        <input type="text" id="nomeCliente" required placeholder="Digite seu nome completo">
+                    </div>
+
+                    <div id="bloco-endereco-entrega" class="form-group">
+                        <label for="enderecoCliente">Endereço de entrega *</label>
+                        <input type="text" id="enderecoCliente" required placeholder="Rua, número, bairro, complemento">
+                    </div>
+
+                    <div id="bloco-endereco-retirada" class="form-group" style="display: none;">
+                        <p class="prato-desc">
+                            <strong>Endereço da loja para retirada:</strong><br>
+                            Sabor de Casa — Rua Exemplo, 123 - Centro (Retirada no balcão)
+                        </p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="formaPagamento">Forma de pagamento *</label>
+                        <select id="formaPagamento" required>
+                            <option value="">Selecione...</option>
+                            <option value="PIX">PIX</option>
+                            <option value="DINHEIRO">Dinheiro</option>
+                            <option value="CARTAO_CREDITO">Cartão de crédito</option>
+                            <option value="CARTAO_DEBITO">Cartão de débito</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rodape-checkout">
+                <div class="rodape-checkout-info">
+                    <span>Itens: <strong id="checkout-qtd">0</strong></span>
+                    <span>Total a pagar: <strong id="checkout-total">R$ 0,00</strong></span>
+                </div>
+                <button type="submit" class="btn-ir-checkout">Confirmar pedido</button>
+            </div>
+        </form>
+
+        <div id="confirmacao-pedido" style="display: none;" class="card-categoria">
+            <div class="card-info" style="width: 100%;">
+                <h3>Pedido confirmado!</h3>
+                <p id="detalhes-confirmacao" class="prato-desc" style="margin: 10px 0 16px;"></p>
+                <a href="index.html" class="btn-ir-checkout">Voltar ao cardápio</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const CHAVE_CARRINHO = 'carrinho';
+
+        function formatarMoeda(valor) {
+            return 'R$ ' + Number(valor || 0).toFixed(2).replace('.', ',');
+        }
+
+        function obterCarrinho() {
+            return JSON.parse(localStorage.getItem(CHAVE_CARRINHO)) || [];
+        }
+
+        function alternarTipoEntrega() {
+            const tipo = document.querySelector('input[name="tipoEntrega"]:checked')?.value;
+            const blocoEntrega = document.getElementById('bloco-endereco-entrega');
+            const blocoRetirada = document.getElementById('bloco-endereco-retirada');
+            const inputEndereco = document.getElementById('enderecoCliente');
+
+            if (tipo === 'RETIRADA') {
+                blocoEntrega.style.display = 'none';
+                blocoRetirada.style.display = 'block';
+                inputEndereco.required = false;
+                inputEndereco.value = '';
+            } else {
+                blocoEntrega.style.display = 'block';
+                blocoRetirada.style.display = 'none';
+                inputEndereco.required = true;
+            }
+        }
+
+        function carregarResumoCheckout() {
+            const itens = obterCarrinho();
+            const formEl = document.getElementById('form-checkout');
+            const vazioEl = document.getElementById('aviso-carrinho-vazio');
+
+            if (itens.length === 0) {
+                formEl.style.display = 'none';
+                vazioEl.style.display = 'flex';
+                return;
+            }
+
+            let qtdTotal = 0;
+            let total = 0;
+
+            itens.forEach((item) => {
+                const qtd = Number(item.quantidade) || 1;
+                const preco = Number(item.preco) || 0;
+                qtdTotal += qtd;
+                total += qtd * preco;
+            });
+
+            document.getElementById('checkout-qtd').innerText = qtdTotal;
+            document.getElementById('checkout-total').innerText = formatarMoeda(total);
+            alternarTipoEntrega();
+        }
+
+        function finalizarCheckout(event) {
+            event.preventDefault();
+
+            const itens = obterCarrinho();
+            if (itens.length === 0) return;
+
+            const tipo = document.querySelector('input[name="tipoEntrega"]:checked')?.value;
+            const nome = document.getElementById('nomeCliente').value.trim();
+            const endereco = document.getElementById('enderecoCliente').value.trim();
+            const pagamento = document.getElementById('formaPagamento').value;
+
+            let total = 0;
+            itens.forEach((item) => {
+                total += (Number(item.quantidade) || 1) * (Number(item.preco) || 0);
+            });
+
+            localStorage.removeItem(CHAVE_CARRINHO);
+
+            document.getElementById('form-checkout').style.display = 'none';
+            const confEl = document.getElementById('confirmacao-pedido');
+            const detalhesEl = document.getElementById('detalhes-confirmacao');
+
+            const infoLocal =
+                tipo === 'ENTREGA'
+                    ? `Entrega para: <strong>${endereco}</strong>`
+                    : `Retirada na loja: <strong>Sabor de Casa — Rua Exemplo, 123 - Centro</strong>`;
+
+            detalhesEl.innerHTML = `
+                Cliente: <strong>${nome}</strong><br>
+                Modalidade: <strong>${tipo === 'ENTREGA' ? 'Entrega' : 'Retirada'}</strong><br>
+                ${infoLocal}<br>
+                Pagamento: <strong>${pagamento}</strong><br>
+                Total: <strong>${formatarMoeda(total)}</strong>
+            `;
+            confEl.style.display = 'block';
+        }
+
+        window.addEventListener('DOMContentLoaded', carregarResumoCheckout);
+    </script>
 </body>
 </html>

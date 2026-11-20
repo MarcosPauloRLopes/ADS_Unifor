@@ -3,9 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Sabor de Casa - Pedido de Compra</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    
+
+    <header class="header-sistema">
+        <div class="logo">Sabor de Casa</div>
+        <nav class="nav-links">     
+            <a href="index.html">Cardápio</a>
+            <a href="development.html" class="ativo">Gerenciar</a>
+        </nav>
+    </header>
+
+    <main class="container-principal">
+        <div class="cabecalho-form-container">
+            <a href="index.html" class="link-voltar-cat">← Voltar ao cardápio</a>
+            <h1 class="titulo-form-cat">Pedido de compra</h1>
+        </div>
+
+        <div id="lista-pedido"></div>
+
+        <div id="resumo-pedido" class="rodape-checkout" style="display: none;">
+            <div class="rodape-checkout-info">
+                <span>Itens: <strong id="pedido-qtd-itens">0</strong></span>
+                <span>Total do carrinho: <strong id="pedido-valor-total">R$ 0,00</strong></span>
+            </div>
+            <div class="prato-controles">
+                <a href="checkout.html" class="btn-ir-checkout">Continuar para checkout</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const CHAVE_CARRINHO = 'carrinho';
+
+        function formatarMoeda(valor) {
+            return 'R$ ' + Number(valor || 0).toFixed(2).replace('.', ',');
+        }
+
+        function lerCarrinho() {
+            return JSON.parse(localStorage.getItem(CHAVE_CARRINHO)) || [];
+        }
+
+        function salvarCarrinhoPedido(itens) {
+            localStorage.setItem(CHAVE_CARRINHO, JSON.stringify(itens));
+            renderizarPedido();
+        }
+
+        function alterarQuantidade(index, delta) {
+            const itens = lerCarrinho();
+            if (!itens[index]) return;
+
+            const novaQtd = itens[index].quantidade + delta;
+            if (novaQtd <= 0) {
+                itens.splice(index, 1);
+            } else {
+                itens[index].quantidade = novaQtd;
+            }
+            salvarCarrinhoPedido(itens);
+        }
+
+        function removerItemPedido(index) {
+            const itens = lerCarrinho();
+            itens.splice(index, 1);
+            salvarCarrinhoPedido(itens);
+        }
+
+        function renderizarPedido() {
+            const itens = lerCarrinho();
+            const container = document.getElementById('lista-pedido');
+            const resumoEl = document.getElementById('resumo-pedido');
+            const qtdEl = document.getElementById('pedido-qtd-itens');
+            const totalEl = document.getElementById('pedido-valor-total');
+
+            container.innerHTML = '';
+
+            if (itens.length === 0) {
+                resumoEl.style.display = 'none';
+                container.innerHTML = `
+                    <div class="card-prato">
+                        <p class="prato-desc">Seu pedido de compra está vazio no momento.</p>
+                        <a href="index.html" class="btn-ir-checkout">Ver cardápio</a>
+                    </div>
+                `;
+                return;
+            }
+
+            let qtdTotal = 0;
+            let valorTotalCarrinho = 0;
+
+            itens.forEach((item, index) => {
+                const qtd = Number(item.quantidade) || 1;
+                const precoUnitario = Number(item.preco) || 0;
+                const subtotalItem = qtd * precoUnitario;
+
+                qtdTotal += qtd;
+                valorTotalCarrinho += subtotalItem;
+
+                const card = document.createElement('div');
+                card.className = 'card-prato';
+                card.innerHTML = `
+                    <div class="prato-esquerda">
+                        <strong class="prato-nome">${item.nome_prato}</strong>
+                    </div>
+
+                    <div class="prato-meio">
+                        <span class="prato-desc">
+                            Qtd: <strong>${qtd}</strong> &nbsp;|&nbsp;
+                            Unitário: <strong>${formatarMoeda(precoUnitario)}</strong> &nbsp;|&nbsp;
+                            Total do item: <strong>${formatarMoeda(subtotalItem)}</strong>
+                        </span>
+                    </div>
+
+                    <div class="prato-direita">
+                        <span class="prato-preco">${formatarMoeda(subtotalItem)}</span>
+                        <div class="prato-controles">
+                            <button type="button" onclick="alterarQuantidade(${index}, -1)">-</button>
+                            <button type="button" onclick="alterarQuantidade(${index}, 1)">+</button>
+                            <button type="button" onclick="removerItemPedido(${index})">Remover</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            qtdEl.innerText = qtdTotal;
+            totalEl.innerText = formatarMoeda(valorTotalCarrinho);
+            resumoEl.style.display = 'flex';
+        }
+
+        window.addEventListener('DOMContentLoaded', renderizarPedido);
+    </script>
 </body>
 </html>

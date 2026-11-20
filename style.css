@@ -68,9 +68,9 @@ body {
    3. CONTAINERS E ESTRUTURA GERAL
    ================================---------- */
 .container-principal {
-    max-width: 1000px;
-    margin: 30px auto;
-    padding: 0 20px;
+    max-width: 1200px;
+    margin: 28px 0 60px 48px;
+    padding: 0 24px 0 0;
 }
 
 .wrapper-centralizado {
@@ -257,4 +257,205 @@ body {
     opacity: 1;
     visibility: visible;
     transform: translateX(-50%) translateY(0);
+}
+
+/* ==========================================
+   6. CARDÁPIO E CHECKING (BLOCO COMPLETO)
+   ========================================== */
+.hero {
+    background: linear-gradient(rgba(26, 21, 18, 0.6), rgba(26, 21, 18, 0.6)),
+        url('imagens/hero.jpg') center/cover no-repeat, #2e1f17;
+    color: #fff;
+    padding: 48px 36px;
+}
+
+.subtitulo-topo {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    opacity: 0.9;
+    margin: 0 0 8px;
+}
+
+.hero h1 {
+    font-size: 36px;
+    line-height: 1.15;
+    margin: 0 0 10px;
+}
+
+.container-principal {
+    max-width: 1140px;
+    min-height: calc(100vh - 260px);
+    margin: 0 0 0 36px;
+    padding: 28px 32px 48px;
+    background-color: #fbf7f2;
+    border-inline: 1px solid var(--borda-sutil);
+    box-sizing: border-box;
+}
+
+.controles,
+.filtros-categoria,
+.prato-controles,
+.rodape-checkout-info {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.controles {
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.filtros-categoria {
+    margin-bottom: 26px;
+}
+
+#campo-busca {
+    flex: 1;
+    min-width: 220px;
+    padding: 11px 14px;
+    border: 1px solid #dcd4cc;
+    border-radius: 8px;
+    background: var(--bg-card);
+}
+
+.filtros-categoria button {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid #e2d8ce;
+    background: var(--bg-card);
+    color: var(--texto-secundario);
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.filtros-categoria button:hover,
+#campo-busca:focus {
+    border-color: var(--cor-primaria);
+    color: var(--cor-primaria);
+    outline: none;
+}
+
+.titulo-categoria-destaque {
+    display: inline-block;
+    background: #4a2417;
+    color: #fff;
+    font-size: 13px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 7px 14px;
+    border-radius: 6px;
+    margin: 22px 0 12px;
+}
+
+.card-prato,
+.rodape-checkout {
+    background: var(--bg-card);
+    border: 1px solid var(--borda-sutil);
+    border-radius: 10px;
+    padding: 16px 22px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.card-prato {
+    display: grid;
+    grid-template-columns: 280px 1fr auto;
+}
+
+.prato-esquerda,
+.prato-meio {
+    display: flex;
+    align-items: center;
+}
+
+.prato-meio {
+    text-align: left;
+}
+
+.prato-desc,
+.toggle-esgotados {
+    font-size: 13px;
+    color: var(--texto-secundario);
+    margin: 0;
+}
+
+.prato-direita {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.prato-preco {
+    background: #f6e3d4;
+    color: var(--cor-primaria-hover);
+    font-weight: 700;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+.prato-controles input {
+    width: 56px;
+    padding: 7px;
+    border: 1px solid #dcd4cc;
+    border-radius: 7px;
+    text-align: center;
+}
+
+.prato-controles button,
+.btn-ir-checkout {
+    background: var(--cor-primaria);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.prato-controles button:hover:not(:disabled),
+.btn-ir-checkout:hover {
+    background: var(--cor-primaria-hover);
+}
+
+.prato-controles button:disabled,
+.prato-controles input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.rodape-checkout {
+    margin-top: 32px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+    .hero {
+        padding: 32px 20px;
+    }
+
+    .container-principal {
+        margin: 0;
+        padding: 20px 16px;
+        border-inline: none;
+    }
+
+    .card-prato,
+    .rodape-checkout {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .prato-direita {
+        justify-content: space-between;
+    }
 }
